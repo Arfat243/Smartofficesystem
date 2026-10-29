@@ -1,0 +1,141 @@
+@model SmartOfficeSystem.Models.TaskModel
+
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Assign New Task";
+}
+
+<style>
+    body { background-color: #f8fafc; }
+    .assign-card {
+        border: none;
+        border-radius: 20px;
+        box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+        background: white;
+    }
+    .form-control, .form-select {
+        border-radius: 12px;
+        padding: 12px 15px;
+        border: 1.5px solid #e2e8f0;
+        transition: all 0.3s;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #4361ee;
+        box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.1);
+    }
+    .card-header-custom {
+        background: linear-gradient(45deg, #4361ee, #4cc9f0);
+        border-radius: 20px 20px 0 0 !important;
+        padding: 25px;
+    }
+    .btn-assign {
+        background: #4361ee;
+        border: none;
+        border-radius: 12px;
+        padding: 12px;
+        font-weight: 700;
+        transition: 0.3s;
+    }
+    .btn-assign:hover {
+        background: #3730a3;
+        transform: translateY(-2px);
+    }
+</style>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7 col-md-9">
+            <div class="card assign-card">
+                <div class="card-header card-header-custom text-white border-0">
+                    <h3 class="mb-0 fw-bold text-center"><i class="fas fa-tasks me-2"></i> Create New Mission</h3>
+                    <p class="text-center mb-0 opacity-75 small mt-1">Fill in the details to deploy a new task</p>
+                </div>
+                <div class="card-body p-4 p-md-5">
+                    <form asp-action="AssignTask" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3 small"></div>
+
+                        <div class="row">
+                            <div class="col-12 mb-4">
+                                <label class="form-label fw-bold text-dark small text-uppercase">Task Title</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0" style="border-radius: 12px 0 0 12px;"><i class="fas fa-heading text-muted"></i></span>
+                                    <input asp-for="TaskName" class="form-control border-start-0" placeholder="e.g. Q4 Financial Audit" />
+                                </div>
+                                <span asp-validation-for="TaskName" class="text-danger extra-small"></span>
+                            </div>
+
+                            <div class="col-12 mb-4">
+                                <label class="form-label fw-bold text-dark small text-uppercase">Detailed Description</label>
+                                <textarea asp-for="Description" class="form-control" rows="3" placeholder="Provide clear instructions..."></textarea>
+                                <span asp-validation-for="Description" class="text-danger extra-small"></span>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label fw-bold text-dark small text-uppercase">Assignee</label>
+                                <select asp-for="AssignedTo" class="form-select shadow-none">
+                                    <option value="">-- Choose Member --</option>
+                                    @if (ViewBag.Employees != null) {
+                                        foreach (var emp in (List<SmartOfficeSystem.Models.Employee>)ViewBag.Employees) {
+                                            <option value="@emp.Id">@emp.Name (@emp.Department)</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mb-4">
+                                <label class="form-label fw-bold text-dark small text-uppercase">Due Date</label>
+                                <input asp-for="Deadline" type="date" class="form-control shadow-none" />
+                            </div>
+
+                            <div class="col-12 mb-4">
+                                <label class="form-label fw-bold text-dark small text-uppercase">Priority Level</label>
+                                <select asp-for="Priority" class="form-select shadow-none border-primary">
+                                    <option value="High">Urgent 🔴</option>
+                                    <option value="Medium" selected>Standard 🟡</option>
+                                    <option value="Low">Low Priority 🟢</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12 mb-5">
+                                <label class="form-label fw-bold text-dark small text-uppercase">Divide Task into Sub-Tasks</label>
+                                <div id="subTaskContainer">
+                                    <div class="input-group mb-2 shadow-sm" style="border-radius: 12px; overflow: hidden;">
+                                        <input type="text" name="subTasks" class="form-control border-0 bg-light" placeholder="Step 1: e.g. Design DB" />
+                                    </div>
+                                </div>
+                                <button type="button" class="btn btn-sm text-primary p-0 fw-bold mt-1" onclick="addSubTaskField()">
+                                    <i class="fas fa-plus-circle me-1"></i> Add More Sub-Task
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-3">
+                            <button type="submit" class="btn btn-primary btn-assign shadow text-white">
+                                <i class="fas fa-rocket me-2"></i> Deploy Task
+                            </button>
+                            <a asp-action="Index" class="btn btn-light fw-bold text-muted py-2" style="border-radius: 12px;">Cancel & Return</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function addSubTaskField() {
+            const container = document.getElementById('subTaskContainer');
+            const newInput = document.createElement('div');
+            newInput.className = 'input-group mb-2 shadow-sm animate__animated animate__fadeIn';
+            newInput.style.borderRadius = "12px";
+            newInput.style.overflow = "hidden";
+            newInput.innerHTML = `
+                <input type="text" name="subTasks" class="form-control border-0 bg-light" placeholder="Next Sub-task">
+                <button type="button" class="btn btn-light text-danger border-0" onclick="this.parentElement.remove()"><i class="fas fa-times"></i></button>
+            `;
+            container.appendChild(newInput);
+        }
+    </script>
+}

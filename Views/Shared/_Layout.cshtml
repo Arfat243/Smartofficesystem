@@ -1,0 +1,101 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SmartOfficeSystem</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/SmartOfficeSystem.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand fw-bold" asp-area="" asp-controller="Home" asp-action="Index">SmartOfficeSystem</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        </li>
+                    </ul>
+
+                    @* --- LOGOUT SECTION (Right Side Only) --- *@
+                    <ul class="navbar-nav">
+                        @if (Context.Session.GetString("UserSession") != null)
+                        {
+                            <li class="nav-item d-flex align-items-center">
+                                <span class="nav-link text-muted me-2">
+                                    Hello, <b>@Context.Session.GetString("UserSession")</b> 
+                                    <span class="badge bg-info text-dark ms-1">@Context.Session.GetString("UserRole")</span>
+                                </span>
+                                @* Logout ko form mein rakhna security ke liye achha hota hai *@
+                                <form method="post" asp-controller="Account" asp-action="Logout" class="form-inline">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm fw-bold px-3" style="border-radius:20px;">
+                                        Logout
+                                    </button>
+                                </form>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+@{
+    var notices = ViewBag.AllNotices as List<string>;
+    var combinedNotice = notices != null && notices.Any() ? string.Join(" | --- | ", notices) : "Welcome to Smart Office System!";
+}
+
+<div class="notice-scroller bg-danger text-white py-2 shadow-sm">
+    <div class="container-fluid d-flex align-items-center">
+        <span class="fw-bold me-3"><i class="fas fa-bolt flash-icon"></i> UPDATES:</span>
+        <marquee behavior="scroll" direction="left" scrollamount="7" class="flex-grow-1 fw-bold">
+            @combinedNotice
+        </marquee>
+    </div>
+</div>
+
+<style>
+    .notice-scroller { font-size: 0.95rem; border-bottom: 2px solid rgba(0,0,0,0.1); }
+    .flash-icon { animation: blink 1s infinite; }
+    @@keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.2; } 100% { opacity: 1; } }
+</style>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container text-center py-3">
+            &copy; 2026 - SmartOfficeSystem - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+@if (Context.Session.GetString("UserRole") == "Admin")
+{
+    <li class="nav-item">
+        <a class="nav-link text-dark fw-bold" asp-controller="Employee" asp-action="Index">Admin Panel</a>
+    </li>
+}
+@if (Context.Session.GetString("UserRole") == "Admin" || Context.Session.GetString("UserRole") == "Manager")
+{
+    <li class="nav-item">
+        <a class="nav-link text-dark fw-bold" asp-controller="Manager" asp-action="Index">Management Panel</a>
+    </li>
+}
+</body>
+
+</html>

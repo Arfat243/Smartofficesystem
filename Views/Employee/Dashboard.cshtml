@@ -1,0 +1,43 @@
+@{
+    ViewData["Title"] = "Dashboard";
+    // Agar data null ho toh 0 dikhaye, error na de
+    var totalEmployees = ViewBag.TotalEmployees ?? 0;
+    var totalSalary = ViewBag.TotalSalary ?? 0;
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <h2 class="mb-4">🚀 Office Overview</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card bg-primary text-white shadow">
+                <div class="card-body">
+                    <h5>Total Employees</h5>
+                    <h2 class="display-4">@totalEmployees</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-success text-white shadow">
+                <div class="card-body">
+                    <h5>Monthly Budget</h5>
+                    <h2 class="display-4">₹@totalSalary</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-info text-white shadow">
+                <div class="card-body text-center">
+                    <h5>Management</h5>
+                    <a asp-controller="Employee" asp-action="Index" class="btn btn-light mt-2">View Employee List</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

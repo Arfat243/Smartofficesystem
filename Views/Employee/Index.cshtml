@@ -1,0 +1,171 @@
+@model IEnumerable<SmartOfficeSystem.Models.Employee>
+
+<div class="container mt-5">
+    @if (TempData["success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow border-0 mb-4" role="alert" style="border-left: 5px solid #28a745; border-radius: 12px;">
+            <i class="fas fa-check-circle me-2"></i> <strong>Success!</strong> @TempData["success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row align-items-center mb-4">
+        <div class="col-md-6">
+            <h2 class="fw-bold text-dark mb-1"><i class="fas fa-users-cog me-2 text-primary"></i> Workforce</h2>
+            <p class="text-muted small">Manage roles, departments, and payroll details.</p>
+        </div>
+        <div class="col-md-6 text-md-end">
+            <a asp-action="ExportToExcel" class="btn btn-outline-success shadow-sm me-2 rounded-pill">
+                <i class="fas fa-file-excel me-1"></i> Export
+            </a>
+            <a asp-action="Create" class="btn btn-primary shadow-sm px-4 rounded-pill">
+                <i class="fas fa-user-plus me-1"></i> Add Employee
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 mb-4" style="border-radius: 15px;">
+        <div class="card-body p-3">
+            <form asp-action="Index" method="get" class="row g-2">
+                <div class="col-md-5">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0" style="border-radius: 10px 0 0 10px;"><i class="fas fa-search text-muted"></i></span>
+                        <input type="text" name="searchString" class="form-control border-start-0 shadow-none" placeholder="Search by name or email..." style="border-radius: 0 10px 10px 0;" />
+                        <button type="submit" class="btn btn-dark ms-2 px-4 rounded-pill">Search</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @* --- STATS CARDS --- *@
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 bg-primary text-white" style="border-radius: 15px;">
+                <div class="card-body d-flex align-items-center">
+                    <i class="fas fa-users fa-2x me-3"></i>
+                    <div>
+                        <h6 class="mb-0">Total Staff</h6>
+                        <h3 class="fw-bold mb-0">@ViewBag.TotalEmployees</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 bg-success text-white" style="border-radius: 15px;">
+                <div class="card-body d-flex align-items-center">
+                    <i class="fas fa-wallet fa-2x me-3"></i>
+                    <div>
+                        <h6 class="mb-0">Monthly Budget</h6>
+                        <h3 class="fw-bold mb-0">₹@ViewBag.TotalSalary.ToString("N0")</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 bg-warning text-dark" style="border-radius: 15px;">
+                <div class="card-body d-flex align-items-center">
+                    <i class="fas fa-tasks fa-2x me-3"></i>
+                    <div>
+                        <h6 class="mb-0">Active Tasks</h6>
+                        <h3 class="fw-bold mb-0">@ViewBag.ActiveTasks</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @* --- EMPLOYEE TABLE WITH PROGRESS --- *@
+    <div class="card shadow-sm border-0" style="border-radius: 15px; overflow: hidden;">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr class="text-secondary text-uppercase small fw-bold">
+                        <th class="px-4 py-3">ID</th>
+                        <th class="py-3">Employee Details</th>
+                        <th class="py-3">Department</th>
+                        <th class="py-3">Performance (Live)</th> @* Naya Column *@
+                        <th class="py-3">Salary</th>
+                        <th class="py-3 text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="px-4"><span class="badge bg-light text-primary border">#@item.Id</span></td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center me-3" 
+                                             style="width: 42px; height: 42px; background: #eef2ff; color: #4361ee; font-weight: bold; border: 1px solid #e0e7ff;">
+                                            @item.Name.Substring(0, 1).ToUpper()
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-dark">@item.Name</div>
+                                            <div class="text-muted extra-small">@item.Email</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge rounded-pill px-3 py-2" style="background-color: #e0f7fa; color: #00838f; border: 1px solid #b2ebf2;">
+                                        @item.Department
+                                    </span>
+                                </td>
+                                
+                                @* --- MERGED PROGRESS BAR LOGIC --- *@
+                                <td style="min-width: 180px;">
+                                    <div class="d-flex align-items-center">
+                                        <div class="progress flex-grow-1 me-2" style="height: 8px; border-radius: 5px; background-color: #f0f0f0;">
+                                            @{
+                                                var barColor = item.Progress < 30 ? "bg-danger" : 
+                                                               item.Progress < 70 ? "bg-warning" : "bg-success";
+                                            }
+                                            <div class="progress-bar @barColor progress-bar-striped progress-bar-animated" 
+                                                 role="progressbar" 
+                                                 style="width: @item.Progress%;"></div>
+                                        </div>
+                                        <span class="fw-bold small text-dark">@item.Progress%</span>
+                                    </div>
+                                </td>
+
+                                <td class="fw-bold text-dark">₹@item.Salary.ToString("N0")</td>
+
+                                <td class="text-center">
+                                    <div class="btn-group" role="group">
+                                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary btn-sm mx-1 shadow-sm rounded-pill px-3">
+                                            <i class="fas fa-edit me-1"></i> Edit
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.Id" 
+                                           class="btn btn-danger btn-sm mx-1 shadow-sm rounded-pill px-3" 
+                                           onclick="return confirm('⚠️ Are you sure?')">
+                                            <i class="fas fa-trash-alt me-1"></i> Delete
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="6" class="text-center py-5 text-muted">
+                                <i class="fas fa-user-slash fa-3x mb-3 opacity-25"></i>
+                                <p>No records found.</p>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .extra-small { font-size: 0.75rem; }
+    .table-hover tbody tr:hover { background-color: #fbfcfe; transition: 0.2s; }
+    .progress-bar-animated { transition: width 0.6s ease; }
+</style>

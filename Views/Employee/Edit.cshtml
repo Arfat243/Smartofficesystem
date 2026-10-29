@@ -1,0 +1,63 @@
+@model SmartOfficeSystem.Models.Employee
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 shadow">
+    <div class="container">
+        <a class="navbar-brand fw-bold" asp-controller="Employee" asp-action="Index">🚀 SmartOffice</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard" ? "active text-warning" : "")" 
+                       asp-controller="Employee" asp-action="Dashboard">📊 Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active text-warning" : "")" 
+                       asp-controller="Employee" asp-action="Index">👥 Employee List</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Employee" asp-action="Create">➕ Add New</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-warning text-dark">
+            <h4>Edit Employee Details</h4>
+        </div>
+        <div class="card-body">
+            <form asp-action="Edit" asp-route-id="@Model.Id" method="post">
+                
+                <input type="hidden" asp-for="Id" />
+
+                <div class="mb-3">
+                    <label class="form-label">Full Name</label>
+                    <input asp-for="Name" class="form-control" required />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Email Address</label>
+                    <input asp-for="Email" type="email" class="form-control" required />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Department</label>
+                    <input asp-for="Department" class="form-control" required />
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Salary</label>
+                    <input asp-for="Salary" type="number" class="form-control" required />
+                </div>
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-warning">Update Changes</button>
+                    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

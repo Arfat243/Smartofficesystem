@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartOfficeSystem", "SmartOfficeSystem.csproj", "{233C9235-7F53-D1D7-2020-BB485F4A5AA8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{233C9235-7F53-D1D7-2020-BB485F4A5AA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{233C9235-7F53-D1D7-2020-BB485F4A5AA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{233C9235-7F53-D1D7-2020-BB485F4A5AA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{233C9235-7F53-D1D7-2020-BB485F4A5AA8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3357A30A-C125-4FF8-BA05-502E496C4EED}
+	EndGlobalSection
+EndGlobal

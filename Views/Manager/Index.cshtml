@@ -1,0 +1,172 @@
+@model List<SmartOfficeSystem.Models.TaskModel>
+@{
+    Layout = "_Layout";
+    var userSession = Context.Session.GetString("UserSession");
+    var isAdmin = userSession?.ToLower().Contains("admin") ?? false;
+    
+    var total = Model.Count;
+    var pending = Model.Count(t => t.Status?.ToLower() == "pending");
+    var completed = Model.Count(t => t.Status?.ToLower() == "completed");
+    var rate = total > 0 ? (completed * 100 / total) : 0;
+}
+
+<style>
+    body { background-color: #f4f7f6; font-family: 'Segoe UI', sans-serif; }
+    .stat-card { border: none; border-radius: 16px; color: white; transition: transform 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+    .stat-card:hover { transform: translateY(-5px); }
+    .bg-soft-blue { background: linear-gradient(45deg, #4facfe 0%, #00f2fe 100%); }
+    .bg-soft-red { background: linear-gradient(45deg, #f85032 0%, #e73827 100%); }
+    .bg-soft-green { background: linear-gradient(45deg, #11998e 0%, #38ef7d 100%); }
+    .bg-soft-purple { background: linear-gradient(45deg, #6a11cb 0%, #2575fc 100%); }
+    .action-panel { background: white; border-radius: 12px; border: 2px solid transparent; transition: 0.3s; }
+    .panel-blue { border-color: #4361ee; }
+    .panel-yellow { border-color: #fbc02d; }
+    .panel-cyan { border-color: #00bcd4; }
+    .btn-action { border-radius: 20px; font-weight: 600; text-decoration: none; display: inline-block; width: 100%; padding: 5px; margin-top: 10px; text-align: center; }
+</style>
+
+<div class="container py-4">
+    @* --- 1. Announcement Center --- *@
+    <div class="card shadow-lg border-0 mb-4" style="border-radius: 20px;">
+        <div class="card-header bg-dark text-white" style="border-radius: 20px 20px 0 0;">
+            <h5 class="mb-0 py-2"><i class="fas fa-bullhorn me-2"></i> Announcement Center</h5>
+        </div>
+        <div class="card-body bg-light">
+            <form asp-action="SaveNotice" asp-controller="Employee" method="post" class="row g-3">
+                <div class="col-md-10">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-0 shadow-sm"><i class="fas fa-pen text-primary"></i></span>
+                        <input type="text" name="message" class="form-control border-0 shadow-sm" placeholder="Write a new office update..." required>
+                    </div>
+                </div>
+                <div class="col-md-2 text-end">
+                    <button type="submit" class="btn btn-primary w-100 shadow-sm rounded-pill">
+                        Publish <i class="fas fa-paper-plane ms-1"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    @* --- 2. Welcome Section --- *@
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h6 class="text-primary fw-bold mb-0">@(isAdmin ? "Admin Control Center" : "Manager Portal")</h6>
+            <h2 class="fw-bold">Welcome, @userSession!</h2>
+            <p class="text-muted small">Real-time overview of team activities.</p>
+        </div>
+        <a asp-action="AssignTask" class="btn btn-primary px-4 py-2 shadow-sm fw-bold rounded-pill">
+            <i class="fas fa-plus-circle me-1"></i> + Assign New Task
+        </a>
+    </div>
+
+    @* --- 3. Stats Cards --- *@
+    <div class="row g-3 mb-4">
+        <div class="col-md-3"><div class="card stat-card bg-soft-blue p-3 h-100"><small class="text-uppercase opacity-75 fw-bold">Total Tasks</small><h2 class="fw-bold mb-0">@total</h2></div></div>
+        <div class="col-md-3"><div class="card stat-card bg-soft-red p-3 h-100"><small class="text-uppercase opacity-75 fw-bold">Still Pending</small><h2 class="fw-bold mb-0">@pending</h2></div></div>
+        <div class="col-md-3"><div class="card stat-card bg-soft-green p-3 h-100"><small class="text-uppercase opacity-75 fw-bold">Completed</small><h2 class="fw-bold mb-0">@completed</h2></div></div>
+        <div class="col-md-3"><div class="card stat-card bg-soft-purple p-3 h-100"><small class="text-uppercase opacity-75 fw-bold">Success Rate</small><h2 class="fw-bold mb-0">@rate%</h2></div></div>
+    </div>
+
+    @* --- 4. Action Panels --- *@
+    <div class="row g-3 mb-5">
+        <div class="col-md-4">
+            <div class="action-panel panel-blue p-3 text-center h-100 shadow-sm">
+                <h6 class="fw-bold mb-1">Team Management</h6>
+                <p class="text-muted extra-small">Monitor and support your direct reports.</p>
+                <a asp-action="Index" asp-controller="Employee" class="btn-action text-primary border border-primary">View Team</a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="action-panel panel-yellow p-3 text-center h-100 shadow-sm">
+                <h6 class="fw-bold mb-1">Leave Requests</h6>
+                <p class="text-muted extra-small">Review and approve employee time-off.</p>
+                <a asp-action="ReviewLeaves" asp-controller="Manager" class="btn-action text-warning border border-warning">Pending Requests</a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="action-panel panel-cyan p-3 text-center h-100 shadow-sm">
+                <h6 class="fw-bold mb-1">System Logs</h6>
+                <p class="text-muted extra-small">Track task changes and security events.</p>
+                <a href="#" class="btn-action text-info border border-info">View Logs</a>
+            </div>
+        </div>
+    </div>
+
+    @* --- 5. Task Table --- *@
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-5">
+        <div class="bg-white p-3 border-bottom"><h5 class="fw-bold mb-0">Team Task Monitoring</h5></div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">TASK DETAILS</th>
+                        <th class="text-center">ASSIGNED</th>
+                        <th class="text-center">STATUS</th>
+                        <th class="text-center">MANAGE</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var task in Model)
+                    {
+                        <tr>
+                            <td class="ps-4">
+                                <div class="fw-bold">@task.TaskName</div>
+                                <div class="text-muted extra-small">@task.Description</div>
+                            </td>
+                            <td class="text-center"><span class="badge bg-light text-dark border p-2">@task.AssignedTo</span></td>
+                            <td class="text-center">
+                                <span class="badge @(task.Status?.ToLower() == "pending" ? "bg-danger" : "bg-success") rounded-pill px-3">@task.Status</span>
+                            </td>
+                            <td class="text-center">
+                                @if (task.Status?.ToLower() == "completed" || isAdmin)
+                                {
+                                    <form asp-action="DeleteTask" asp-controller="Manager" method="post" onsubmit="return confirm('Delete?');">
+                                        <input type="hidden" name="taskId" value="@task.TaskId" />
+                                        <button type="submit" class="btn btn-sm btn-danger border-0"><i class="fas fa-trash"></i></button>
+                                    </form>
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    @* --- 6. Recent Notices (Sahi jagah loop ke bahar) --- *@
+    <div class="card shadow-sm border-0 mt-4" style="border-radius: 15px;">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+            <h5 class="mb-0 text-dark fw-bold"><i class="fas fa-bullhorn me-2 text-primary"></i> Recent Notices</h5>
+            <a href="@Url.Action("AddNotice", "Manager")" class="btn btn-primary btn-sm rounded-pill"><i class="fas fa-plus"></i> New Notice</a>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr><th>Date</th><th>Title</th><th>Content</th><th class="text-center">Action</th></tr>
+                    </thead>
+                    <tbody>
+                        @if (ViewBag.Notices != null) {
+                            foreach (var notice in (IEnumerable<dynamic>)ViewBag.Notices) {
+                                <tr>
+                                    <td>@notice.PostedDate.ToString("dd MMM")</td>
+                                    <td><strong>@notice.Title</strong></td>
+                                    <td>@notice.Content</td>
+                                    <td class="text-center">
+                                        <form asp-action="DeleteNotice" method="post" onsubmit="return confirm('Uda doon?');">
+                                            <input type="hidden" name="id" value="@notice.Id" />
+                                            <button type="submit" class="btn btn-sm btn-danger border-0"><i class="fas fa-trash"></i></button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        } else {
+                            <tr><td colspan="4" class="text-center">Koi naya notice nahi hai.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

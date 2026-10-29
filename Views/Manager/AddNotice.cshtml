@@ -1,0 +1,32 @@
+@model SmartOfficeSystem.Models.NoticeModel
+@{
+    Layout = "_Layout";
+}
+
+<div class="container py-5">
+    <div class="card shadow-lg border-0 mx-auto" style="max-width: 650px; border-radius: 20px;">
+        <div class="card-header bg-primary text-white p-4" style="border-radius: 20px 20px 0 0;">
+            <h4 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Create New Notice</h4>
+        </div>
+        <div class="card-body p-4 bg-white">
+            <form asp-action="AddNotice" asp-controller="Manager" method="post">
+                <div class="mb-4">
+                    <label class="form-label fw-bold text-dark">Notice Title</label>
+                    <input type="text" asp-for="Title" class="form-control form-control-lg shadow-sm" placeholder="Enter a catchy title..." required />
+                </div>
+                
+                <div class="mb-4">
+                    <label class="form-label fw-bold text-dark">Announcement Message</label>
+                    <textarea asp-for="Content" class="form-control shadow-sm" rows="6" placeholder="Describe the announcement in detail..." required></textarea>
+                </div>
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a asp-action="Index" class="btn btn-light border px-4 rounded-pill">Cancel</a>
+                    <button type="submit" class="btn btn-primary px-5 rounded-pill shadow">
+                        Post Announcement <i class="fas fa-paper-plane ms-2"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
